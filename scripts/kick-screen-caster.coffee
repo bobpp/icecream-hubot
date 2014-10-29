@@ -3,9 +3,9 @@
 #
 # Commands:
 #   hubot initialize - part number をクリアしてscreenをTEASERにする
+#   hubot part start <part number> - parn <part number> をスタートさせ、screenをMEMBERSにする
 #   hubot part set <part number> - parn <part number> にセットするだけ
-#   hubot part start <part number> - parn <part number> をスタートさせ、コメンテーターリストを表示
-#   hubot screen <tweet url | DEFAULT | TITLE | HASH-TAG | TEASER> - screen 内容を更新する
+#   hubot screen <tweet url | TEASER | CONTENTS | MEMBERS | HASH-TAG > - screen 内容を更新する
 #
 # Author:
 #   bobpp
@@ -19,7 +19,7 @@ module.exports = (robot) ->
       cwd: process.env.HUBOT_KICK_SCREEN_CASTER_DIR
 
     part_id = robot.brain.get("currentPart") or 0
-    command = "carton exec perl screen-maker.pl --theme " + part_id.toString() + " " + url
+    command = "carton exec perl screen-maker.pl --config " + process.env.HUBOT_KICK_SCREEN_CASTER_CONFIG_PATH +  " --theme " + part_id.toString() + " " + url
     child_process.exec command, options, (error, stdout, stderr) ->
       if !error
         payload =
@@ -74,7 +74,7 @@ module.exports = (robot) ->
 
   robot.respond /part start (\d+)/i, (msg) ->
     robot.brain.set("currentPart", parseInt(msg.match[1]))
-    kickScreenMaker msg, "DEFAULT"
+    kickScreenMaker msg, "MEMBERS"
 
   robot.respond /screen (.*)/i, (msg) ->
     kickScreenMaker msg, msg.match[1]
